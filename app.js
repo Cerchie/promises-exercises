@@ -100,45 +100,45 @@
 // 	.catch((err) => console.log(err));
 
 //mimicaxios
-function get(url) {
-	const request = new XMLHttpRequest();
-	return new Promise((resolve, reject) => {
-		request.onload = function() {
-			if (request.readyState != 4) return;
+// function get(url) {
+// 	const request = new XMLHttpRequest();
+// 	return new Promise((resolve, reject) => {
+// 		request.onload = function() {
+// 			if (request.readyState != 4) return;
 
-			if (request.status >= 200 && request.status < 300) {
-				resolve({
-					data: JSON.parse(request.response),
-					status: request.status,
-					request: request,
-					headers: request.getAllResponseHeaders
-				});
-			} else {
-				reject({
-					msg: 'server err',
-					request: request,
-					status: request.status
-				});
-			}
-		};
-		request.onerror = function handleError() {
-			request = null;
-			reject({
-				msg: 'network err'
-			});
-		};
-		request.open('GET', url);
-		request.send();
-	});
-}
+// 			if (request.status >= 200 && request.status < 300) {
+// 				resolve({
+// 					data: JSON.parse(request.response),
+// 					status: request.status,
+// 					request: request,
+// 					headers: request.getAllResponseHeaders
+// 				});
+// 			} else {
+// 				reject({
+// 					msg: 'server err',
+// 					request: request,
+// 					status: request.status
+// 				});
+// 			}
+// 		};
+// 		request.onerror = function handleError() {
+// 			request = null;
+// 			reject({
+// 				msg: 'network err'
+// 			});
+// 		};
+// 		request.open('GET', url);
+// 		request.send();
+// 	});
+// }
 
-get('http://api.icndb.com/jokes')
-	.then((res) => {
-		console.log(res);
-		return get('http://api.icndb.com/jokes');
-	})
-	.then((res) => console.log(res))
-	.catch((err) => console.log(err));
+// get('http://api.icndb.com/jokes')
+// 	.then((res) => {
+// 		console.log(res);
+// 		return get('http://api.icndb.com/jokes');
+// 	})
+// 	.then((res) => console.log(res))
+// 	.catch((err) => console.log(err));
 
 // promise.all and .race
 
@@ -156,14 +156,52 @@ get('http://api.icndb.com/jokes')
 // 	})
 // 	.catch((err) => console.log(err));
 
-let fourPokemonRace = [];
+// let fourPokemonRace = [];
 
-for (let i = 1; i < 5; i++) {
-	fourPokemonRace.push(axios.get(`https://pokeapi.co/api/v2/pokemon/${i}`));
-}
+// for (let i = 1; i < 5; i++) {
+// 	fourPokemonRace.push(axios.get(`https://pokeapi.co/api/v2/pokemon/${i}`));
+// }
 
-Promise.race(fourPokemonRace)
-	.then((res) => {
-		console.log(`${res.data.name} won the race`);
+// Promise.race(fourPokemonRace)
+// 	.then((res) => {
+// 		console.log(`${res.data.name} won the race`);
+// 	})
+// 	.catch((err) => console.log(err));
+
+//Part 1: Number Facts
+//make a request to the numbers API to get a fact about your favorite number
+let url = 'http://numbersapi.com/2?json';
+let numberPromise = axios.get(url);
+
+numberPromise.then((data) => console.log(data)).catch((err) => console.log(err));
+
+//getting data on multiple numbers
+
+let urlForMultipleNumbers = 'http://numbersapi.com/1..3';
+let multipleNumberPromise = axios.get(urlForMultipleNumbers);
+multipleNumberPromise
+	.then((data) => {
+		let p = document.getElementById('p');
+		p.innerHTML = `${data.data[1]} ${data.data[2]} ${data.data[3]}`;
 	})
 	.catch((err) => console.log(err));
+
+//getting data 4 times on one num
+
+let fourFavesPromises = [];
+
+for (let i = 1; i < 5; i++) {
+	fourFavesPromises.push(axios.get(`http://numbersapi.com/${i}`));
+}
+
+Promise.all(fourFavesPromises)
+	.then((faveArr) => {
+		for (res of faveArr) {
+			let p2 = document.getElementById('p2');
+			p2.innerHTML = `${res.data} ${res.data} ${res.data} ${res.data}`;
+			console.log(res.data);
+		}
+	})
+	.catch((err) => console.log(err));
+
+//deck of cards portion of exercise
