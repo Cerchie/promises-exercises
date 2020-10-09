@@ -149,59 +149,80 @@
 // }
 
 // Promise.all(fourPokemonPromises)
-// 	.then((pokemonArr) => {
-// 		for (res of pokemonArr) {
-// 			console.log(res.data.name);
+// 	let p = document.getElementById('p');
+// 	p.innerHTML = `${data.data[1]} ${data.data[2]} ${data.data[3]}`;
+// })
+// .catch((err) => console.log(err));
+
+//getting data 4 times on one num
+
+// let fourFavesPromises = [];
+
+// for (let i = 1; i < 5; i++) {
+// 	fourFavesPromises.push(axios.get(`http://numbersapi.com/${i}`));
+// }
+
+// Promise.all(fourFavesPromises)
+// 	.then((faveArr) => {
+// 		for (res of faveArr) {
+// 			let p2 = document.getElementById('p2');
+// 			p2.innerHTML = `${res.data} ${res.data} ${res.data} ${res.data}`;
 // 		}
 // 	})
 // 	.catch((err) => console.log(err));
 
-// let fourPokemonRace = [];
+//deck of cards portion of exercise
 
-// for (let i = 1; i < 5; i++) {
-// 	fourPokemonRace.push(axios.get(`https://pokeapi.co/api/v2/pokemon/${i}`));
-// }
+// let cardUrl = 'https://deckofcardsapi.com/api/deck/new/draw/?count=1';
+// let cardPromise = axios.get(cardUrl);
 
-// Promise.race(fourPokemonRace)
-// 	.then((res) => {
-// 		console.log(`${res.data.name} won the race`);
+// cardPromise
+// 	.then((data) => {
+// 		let btn = document.getElementById('btn');
+// 		btn.onclick = function() {
+// 			let div = document.getElementById('display-div');
+// 			div.innerHTML = `${data.data.cards[0].value} ${data.data.cards[0].suit}`;
+// 		};
+// 		return axios.get(cardUrl);
+// 	})
+// 	.then((data) => {
+// 		let btn = document.getElementById('btn');
+// 		btn.onclick = function() {
+// 			let div = document.getElementById('display-div');
+// 			div.innerHTML = `${data.data.cards[0].value} ${data.data.cards[0].suit}`;
+// 		};
 // 	})
 // 	.catch((err) => console.log(err));
+//^my attempt-- got stuck on how to repeat. The solution solves this by calling on the url that draws a card without setting a limited count
+//ps-- there is some fancy css stuff in this function that does not match mine
+$(function () {
+    let baseURL = 'https://deckofcardsapi.com/api/deck';
 
-//Part 1: Number Facts
-//make a request to the numbers API to get a fact about your favorite number
-let url = 'http://numbersapi.com/2?json';
-let numberPromise = axios.get(url);
+    // 3.
+    let deckId = null;
+    let $btn = $('button');
+    let $cardArea = $('#card-area');
 
-numberPromise.then((data) => console.log(data)).catch((err) => console.log(err));
+    $.getJSON(`${baseURL}/new/shuffle/`).then(data => {
+        deckId = data.deck_id;
+        $btn.show();
+    });
 
-//getting data on multiple numbers
-
-let urlForMultipleNumbers = 'http://numbersapi.com/1..3';
-let multipleNumberPromise = axios.get(urlForMultipleNumbers);
-multipleNumberPromise
-	.then((data) => {
-		let p = document.getElementById('p');
-		p.innerHTML = `${data.data[1]} ${data.data[2]} ${data.data[3]}`;
-	})
-	.catch((err) => console.log(err));
-
-//getting data 4 times on one num
-
-let fourFavesPromises = [];
-
-for (let i = 1; i < 5; i++) {
-	fourFavesPromises.push(axios.get(`http://numbersapi.com/${i}`));
-}
-
-Promise.all(fourFavesPromises)
-	.then((faveArr) => {
-		for (res of faveArr) {
-			let p2 = document.getElementById('p2');
-			p2.innerHTML = `${res.data} ${res.data} ${res.data} ${res.data}`;
-			console.log(res.data);
-		}
-	})
-	.catch((err) => console.log(err));
-
-//deck of cards portion of exercise
+    $btn.on('click', function () {
+        $.getJSON(`${baseURL}/${deckId}/draw/`).then(data => {
+            let cardSrc = data.cards[0].image;
+            let angle = Math.random() * 90 - 45;
+            let randomX = Math.random() * 40 - 20;
+            let randomY = Math.random() * 40 - 20;
+            $cardArea.append(
+                $('<img>', {
+                    src: cardSrc,
+                    css: {
+                        transform: `translate(${randomX}px, ${randomY}px) rotate(${angle}deg)`
+                    }
+                })
+            );
+            if (data.remaining === 0) $btn.remove();
+        });
+    });
+});
